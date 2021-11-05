@@ -43,7 +43,9 @@ function Post({ data }) {
                 </h3>
                 {showComents && (
                     <>
-                        <Coment />
+                    {data.Answers.map(answer => (
+                        <Coment answer={answer} />
+                    ))}
                     </>
                 )}
                 <div>
@@ -55,7 +57,7 @@ function Post({ data }) {
     );
 }
 
-function Coment() {
+function Coment({ answer, ...props}) {
 
     return (
         <CardComent>
@@ -66,7 +68,7 @@ function Coment() {
                     <span>em 10/10/2021 às 13:00</span>
                 </div>
             </header>
-            <p>Este é o comentário</p>
+            <p>{answer.description}</p>
         </CardComent>
     );
 }
