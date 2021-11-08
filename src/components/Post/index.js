@@ -26,14 +26,18 @@ function Post({ data }) {
 
     const toggleComents = () => setShowComents(!showComents);
 
-    
 
     const handleComment = async (event, question) => {
         try {
             event.preventDefault();
             const response = await api.post(`questions/${question?.id}/answers`, {description: comment})
-
-            console.log(response)   
+            
+            if(response.status === 201) {
+                /** uma sugestão de melhoria seria passar o mesmo objeto de answers do get no response da requisição
+                 * nesse caso eu poderia atualizar os comentários sem ter que atualizar a tela
+                 */
+                window.location.reload();
+            } 
         } catch (error) {
             console.error(error)
         }
@@ -46,6 +50,7 @@ function Post({ data }) {
             setDisable(false)
         }
     }, [comment])
+
 
     return (
         <CardPost>
