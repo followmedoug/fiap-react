@@ -1,18 +1,51 @@
-import { CardComent, CardPost } from "./styles";
-import imgProfile from "../../assets/profile.png"
-import { useState } from "react";
-import { getUser } from "../../services/security";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
+import styled, {css} from 'styled-components'
+import imgProfile from "../../assets/profile.png"
+import { getUser } from "../../services/security";
+import { api } from '../../services/api'
+import { CardComent, CardPost } from "./styles";
+
+const StyledButton = styled.button`
+    cursor: pointer;
+
+    ${({ disabled }) => disabled ? css`
+        background-color: rgba(237, 20, 91, 0.5);
+        cursor: default;
+    `: ""}
+`
 
 function Post({ data }) {
 
     let signedUser = getUser();
 
-    console.log(data)
-
     const [showComents, setShowComents] = useState(false);
+    const [comment, setComment] = useState("")
+    const [anwsers, setAnswers] = useState(data.Answers)
+    const [disable, setDisable] = useState(false)
 
     const toggleComents = () => setShowComents(!showComents);
+
+    
+
+    const handleComment = async (event, question) => {
+        try {
+            event.preventDefault();
+            const response = await api.post(`questions/${question?.id}/answers`, {description: comment})
+
+            console.log(response)   
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    useEffect(() => {
+        if(comment.length < 10) {
+            setDisable(true)
+        } else {
+            setDisable(false)
+        }
+    }, [comment])
 
     return (
         <CardPost>
@@ -36,22 +69,24 @@ function Post({ data }) {
             <footer>
                 <h3 onClick={toggleComents}>
                     {
-                        data.Answers.length === 0 ?
+                        anwsers === 0 ?
                             "Seja o primeiro a comentar" :
-                            `${data.Answers.length} Comentário${data.Answers.length > 1 && "s"}`
+                            `${anwsers.length} Comentário${anwsers.length > 1 && "s"}`
                     }
                 </h3>
                 {showComents && (
                     <>
-                    {data.Answers.map(answer => (
+                    {anwsers.map(answer => (
                         <Coment answer={answer} />
                     ))}
                     </>
                 )}
-                <div>
-                    <input placeholder="Comente este post" />
-                    <button>Enviar</button>
-                </div>
+                <form onSubmit={event => handleComment(event, data)} >
+                    <div>
+                        <input placeholder="Comente este post" onChange={event => setComment(event.target.value)} />
+                        <StyledButton disabled={disable}>Enviar</StyledButton>
+                    </div>
+                </form>
             </footer>
         </CardPost>
     );
@@ -60,12 +95,12 @@ function Post({ data }) {
 function Coment({ answer, ...props}) {
 
     return (
-        <CardComent>
+        <CardComent {...props}>
             <header>
-                <img src={imgProfile} />
+                <img alt="avatar" src={answer.Student.image} />
                 <div>
-                    <p>por Ciclano</p>
-                    <span>em 10/10/2021 às 13:00</span>
+                    <p>por {answer.Student.name}</p>
+                    <span>{answer.Student.created_at}</span>
                 </div>
             </header>
             <p>{answer.description}</p>
