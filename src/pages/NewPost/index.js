@@ -121,7 +121,7 @@ function NewPost() {
         return <div>Carregando...</div>
 
     return (
-        <Container>
+        <Container style={{ overflow:'auto'}}>
             <Header />
             <FormNewPost onSubmit={handleSubmit}>
                 <h1>Nova postagem</h1>
@@ -167,7 +167,7 @@ function NewPost() {
                     )}
                 </div>
                 <input type="file" accept="image/*" onChange={handleImage} />
-                <img alt="Pré-visualização" ref={imageRef} />
+                <img alt="Pré-visualização" ref={imageRef} style={{ width: '300px'}} />
                 <button>Enviar</button>
             </FormNewPost>
         </Container>
